@@ -1,9 +1,10 @@
-int aStar = 0, c = 0, bStar = 0, c1 = 0; //3.6 градусов за 1 итерацию
-int A, l;
-int AA;
-int B;
-int BB, f, f1;
-int a, b, d;
+int c, c1; //переменные для подсчета итераций
+int l; //переменная для условия
+int AA, BB; //1 энкодер 1 датчик, 1 энкодер 2 датчик
+int A, B; //2 энкодер 1 датчик, 2 энкодер 2 датчик
+int f, f1; //переменные для расчета расстояния в сантиметрах
+int a, b; //переменные текущей позиции(для каждого из моторов)
+int aOLD, bOLD; //переменные для предыдущей позиции(для каждого из моторов)
 #define sp 40 //напряжение на правом(5 пин) двигателе 34
 #define sp1 30 //напряжение на левом(6 пин) двигателе 40
 #define VOL LOW //выбор направления(7 пин)
@@ -17,7 +18,7 @@ void setup() {
   B = digitalRead(A3);
   BB = digitalRead(A1);
 
-  if (AA < 500) //
+  if (AA < 500) //т.к энкодер не выдает 0, переделывает аналоговый сигнал в 0 или 1
   {
     AA = 0;
   }
@@ -27,8 +28,8 @@ void setup() {
 
   a = B + A * 10;
   b = BB + AA * 10;
-  aStar = a;
-  bStar = b;
+  aOLD = a;
+  bOLD = b;
 }
 
 void loop() {
@@ -53,10 +54,10 @@ void loop() {
 
 
 
-  if (a != aStar)
+  if (a != aOLD)
   {
     switch (a) {
-      case 0: if (aStar == 1 && aStar != 11)
+      case 0: if (aOLD == 1 && aOLD != 11)
         {
           c = c + 1;
         }
@@ -65,7 +66,7 @@ void loop() {
           c = c - 1;
         }
         break;
-      case 1: if (aStar == 11 && aStar != 10)
+      case 1: if (aOLD == 11 && aOLD != 10)
         {
           c = c + 1;
         }
@@ -74,7 +75,7 @@ void loop() {
           c = c - 1;
         }
         break;
-      case 10: if (aStar == 0 && aStar != 1)
+      case 10: if (aOLD == 0 && aOLD != 1)
         {
           c = c + 1;
         }
@@ -83,7 +84,7 @@ void loop() {
           c = c - 1;
         }
         break;
-      case 11: if (aStar == 10 && aStar != 0)
+      case 11: if (aOLD == 10 && aOLD != 0)
         {
           c = c + 1;
         }
@@ -97,10 +98,10 @@ void loop() {
 
   //another dynamo
 
-  if (b != bStar)
+  if (b != bOLD)
   {
     switch (b) {
-      case 0: if (bStar == 10 && bStar != 11)
+      case 0: if (bOLD == 10 && bOLD != 11)
         {
           c1++;
         }
@@ -109,7 +110,7 @@ void loop() {
           c1--;
         }
         break;
-      case 1: if (bStar == 0 && bStar != 10)
+      case 1: if (bOLD == 0 && bOLD != 10)
         {
           c1++;
         }
@@ -118,7 +119,7 @@ void loop() {
           c1--;
         }
         break;
-      case 10: if (bStar == 11 && bStar != 1)
+      case 10: if (bOLD == 11 && bOLD != 1)
         {
           c1++;
         }
@@ -127,7 +128,7 @@ void loop() {
           c1--;
         }
         break;
-      case 11: if (bStar == 1 && bStar != 0)
+      case 11: if (bOLD == 1 && bOLD != 0)
         {
           c1++;
         }
@@ -176,7 +177,7 @@ void loop() {
   Serial.println(c1);
 
 
-  aStar = a;
-  bStar = b;
+  aOLD = a;
+  bOLD = b;
 
 }
