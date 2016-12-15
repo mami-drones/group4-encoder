@@ -7,7 +7,7 @@ int a, b, d; //переменные текущей позиции(a=A, B; b=AA, 
 int aOLD, bOLD; //переменные для предыдущей позиции(для каждого из моторов)
 
 
-int turn(int x, int y, int z, int n, boolean p, boolean m) //входящие переменные: 1.расстояние для поворота 1 мотора, 2. расстояние для поворота 2 мотора, 3. наряжение для 1 мотора 4. напряжение для 2 мотора 5. напряжение для направления 1 мотора(True || False) 6. напряжение для направления 2 мотора(True || False)
+int turnLeft(int x, int y, int z, int n) //входящие переменные: 1.расстояние для поворота 1 мотора, 2. расстояние для поворота 2 мотора, 3. наряжение для 1 мотора 4. напряжение для 2 мотора.
 {
   while (c > x && c1 < y)
   {
@@ -145,11 +145,11 @@ int turn(int x, int y, int z, int n, boolean p, boolean m) //входящие п
     //анализ состояния
 
     //c
-    digitalWrite(7, p);
+    digitalWrite(7, true);
     analogWrite(6, z);
 
     //c1
-    digitalWrite(4, m);
+    digitalWrite(4, false);
     analogWrite(5, n);
 
     aOLD = a;
@@ -160,9 +160,162 @@ int turn(int x, int y, int z, int n, boolean p, boolean m) //входящие п
 }
 
 
-int forward(int x, int y, int z, int n, boolean p, boolean m) //входящие переменные: 1.расстояние для 1 мотора, 2. расстояние для 2 мотора, 3. наряжение для 1 мотора 4. напряжение для 2 мотора 5. напряжение для направления 1 мотора(True || False) 6. напряжение для направления 2 мотора(True || False)
+int turnRight(int x, int y, int z, int n) //входящие переменные: 1.расстояние для поворота 1 мотора, 2. расстояние для поворота 2 мотора, 3. наряжение для 1 мотора 4. напряжение для 2 мотора
 {
-  while (f < x && f1 < y)
+  while (c < x && c1 > y)
+  {
+    //анализ энкодера
+
+    A = analogRead(A2);
+    AA = analogRead(A0);
+    B = analogRead(A3);
+    BB = analogRead(A1);
+
+    if (AA < 500) //т.к энкодер не выдает 0, переделывает аналоговый сигнал в 0 или 1
+    {
+      AA = 0;
+    }
+    else {
+      AA = 1;
+    }
+
+
+    if (A < 500) //т.к энкодер не выдает 0, переделывает аналоговый сигнал в 0 или 1
+    {
+      A = 0;
+    }
+    else {
+      A = 1;
+    }
+
+
+    if (B < 500) //т.к энкодер не выдает 0, переделывает аналоговый сигнал в 0 или 1
+    {
+      B = 0;
+    }
+    else {
+      B = 1;
+    }
+
+
+    if (BB < 500) //т.к энкодер не выдает 0, переделывает аналоговый сигнал в 0 или 1
+    {
+      BB = 0;
+    }
+    else {
+      BB = 1;
+    }
+
+    a = B + A * 10;
+    b = BB + AA * 10;
+
+
+    if (a != aOLD)
+    {
+      switch (a) {
+        case 0: if (aOLD == 1 && aOLD != 11)
+          {
+            c = c + 1;
+          }
+          else
+          {
+            c = c - 1;
+          }
+          break;
+        case 1: if (aOLD == 11 && aOLD != 10)
+          {
+            c = c + 1;
+          }
+          else
+          {
+            c = c - 1;
+          }
+          break;
+        case 10: if (aOLD == 0 && aOLD != 1)
+          {
+            c = c + 1;
+          }
+          else
+          {
+            c = c - 1;
+          }
+          break;
+        case 11: if (aOLD == 10 && aOLD != 0)
+          {
+            c = c + 1;
+          }
+          else
+          {
+            c = c - 1;
+          }
+          break;
+      }
+    }
+
+    //another dynamo
+
+    if (b != bOLD)
+    {
+      switch (b) {
+        case 0: if (bOLD == 10 && bOLD != 11)
+          {
+            c1++;
+          }
+          else
+          {
+            c1--;
+          }
+          break;
+        case 1: if (bOLD == 0 && bOLD != 10)
+          {
+            c1++;
+          }
+          else
+          {
+            c1--;
+          }
+          break;
+        case 10: if (bOLD == 11 && bOLD != 1)
+          {
+            c1++;
+          }
+          else
+          {
+            c1--;
+          }
+          break;
+        case 11: if (bOLD == 1 && bOLD != 0)
+          {
+            c1++;
+          }
+          else
+          {
+            c1--;
+          }
+          break;
+      }
+    }
+    //анализ состояния
+
+    //c
+    digitalWrite(7, false);
+    analogWrite(6, z);
+
+    //c1
+    digitalWrite(4, true);
+    analogWrite(5, n);
+
+    aOLD = a;
+    bOLD = b;
+  }
+  c = 0;
+  c1 = 0;
+}
+
+
+int forward(int x, int z, int n, boolean p) //входящие переменные: 1.расстояние для 1 мотора, 2. наряжение левого для мотора 3. напряжение для правого мотора 4. напряжение для направления 1 мотора(True || False) 5. напряжение для направления 2 мотора(True || False)
+{
+  while (f < x && f1 < x)
   {
 
     //анализ энкодера
@@ -297,8 +450,8 @@ int forward(int x, int y, int z, int n, boolean p, boolean m) //входящие
       }
     }
 
-    f = ((3.14 * 36) / (480)) * c;
-    f1 = ((3.14 * 36) / (480)) * c1;
+    f = ((3.14 * 39) / (440)) * c;
+    f1 = ((3.14 * 39) / (440)) * c1;
 
     //анализ ситуации
 
@@ -331,12 +484,14 @@ int forward(int x, int y, int z, int n, boolean p, boolean m) //входящие
     else
     {
       //мотор с1
-      digitalWrite(4, m);
+      digitalWrite(4, p);
       analogWrite(5, n);
       analogWrite(6, 0);
 
     }
-
+  Serial.print(c);
+  Serial.print(" ");
+  Serial.println(c1);
 
     aOLD = a;
     bOLD = b;
@@ -402,10 +557,19 @@ void loop() //LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
   //поворот налево на 90 градусов итерации: -24 24, напряжение:35 35
   //примеры:
   //turn(расстояние для поворота 1 мотора, расстояние для поворота 2 мотора, наряжение для 1 мотора, напряжение для 2 мотора, напряжение для направления 1 мотора(True || False), напряжение для направления 2 мотора(True || False));
-  //forward(расстояние для 1 мотора(см), расстояние для 2 мотора(см), напряжение для 1 мотора, напряжение для 2 мотора, напряжение для направления 1 мотора(True || False), напряжение для направления 2 мотора(True || False));
-  forward(50, 50, 50, 55, false, false);
-  turn(-75, 75, 40, 40, true, false);
-  forward(50, 50, 50, 55, false, false);
+  //forward(расстояние для 1 мотора(см), расстояние для 2 мотора(см), напряжение для левого мотора, напряжение для правого мотора, напряжение для направления 1 мотора(True-назад || False-вперед));
+  forward(170, 50, 50, false);
+  turnLeft(-36, 36, 40, 40);
+  forward(145, 50, 50, false);
+  turnLeft(-36, 36, 40, 40);
+  forward(33, 50, 50, false);
+  turnRight(36, -36, 40, 40);
+  forward(45, 50, 50, false);
+
+  
+  //turnRight(30, -30, 40, 40);
+  //turnLeft(-23, 23, 40, 40);
+
 
   while (d == 0)
   {
